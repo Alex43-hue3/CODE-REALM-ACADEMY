@@ -1,45 +1,338 @@
-
 /* =========================================================
    NETVISION - APP.JS
-   TV EN VIVO + HLS + PELICULAS + SERIES + BUSCADOR
+   TV EN VIVO + M3U + PELÍCULAS + SERIES
+   DATOS DE PRUEBA
 ========================================================= */
 
 "use strict";
 
 
 /* =========================================================
-   CONFIGURACIÓN
+   CONFIGURACIÓN TV
 ========================================================= */
 
 const M3U_FILE = "./canales.m3u";
 
-const CONTENT_API =
-    "https://zonaapis.arcando.cloud";
-
-const API_MAX_PAGES = 3;
-
 
 /* =========================================================
-   VARIABLES GLOBALES
+   VARIABLES TV
 ========================================================= */
 
 let channels = [];
-
-let movies = [];
-
-let series = [];
-
 let currentChannel = null;
-
 let currentCategory = null;
-
-let currentMovie = null;
-
 let hls = null;
 
 let videoPlayer = null;
-
 let playerPlaceholder = null;
+
+
+/* =========================================================
+   VARIABLES PELÍCULAS / SERIES
+========================================================= */
+
+let peliculas = [];
+let series = [];
+
+let contenidoActual = null;
+
+
+/* =========================================================
+   DATOS DE PRUEBA
+========================================================= */
+
+const PELICULAS_PRUEBA = [
+
+    {
+        id: "movie-001",
+        titulo: "Horizonte Final",
+        descripcion:
+            "Una misión espacial descubre una señal desconocida que podría cambiar el destino de la humanidad.",
+        genero: "Ciencia ficción",
+        rating: "8.9",
+        anio: "2026",
+        duracion: "2h 08min",
+        popular: true,
+        nuevo: true,
+        poster:
+            "https://placehold.co/400x600/101522/ffffff?text=Horizonte%20Final"
+    },
+
+    {
+        id: "movie-002",
+        titulo: "Operación Sombra",
+        descripcion:
+            "Un agente retirado debe regresar al campo para detener una amenaza internacional.",
+        genero: "Acción",
+        rating: "8.7",
+        anio: "2025",
+        duracion: "1h 58min",
+        popular: true,
+        nuevo: false,
+        poster:
+            "https://placehold.co/400x600/17110f/ffffff?text=Operacion%20Sombra"
+    },
+
+    {
+        id: "movie-003",
+        titulo: "El Reino Perdido",
+        descripcion:
+            "Un joven descubre un reino oculto donde la magia todavía existe.",
+        genero: "Fantasía",
+        rating: "8.5",
+        anio: "2026",
+        duracion: "2h 15min",
+        popular: true,
+        nuevo: true,
+        poster:
+            "https://placehold.co/400x600/17121f/ffffff?text=El%20Reino%20Perdido"
+    },
+
+    {
+        id: "movie-004",
+        titulo: "La Casa Oscura",
+        descripcion:
+            "Una familia llega a una antigua casa donde comienzan a ocurrir fenómenos inexplicables.",
+        genero: "Terror",
+        rating: "8.2",
+        anio: "2025",
+        duracion: "1h 46min",
+        popular: true,
+        nuevo: false,
+        poster:
+            "https://placehold.co/400x600/130f16/ffffff?text=La%20Casa%20Oscura"
+    },
+
+    {
+        id: "movie-005",
+        titulo: "Guardianes del Tiempo",
+        descripcion:
+            "Un grupo de viajeros intenta impedir que una organización cambie la historia.",
+        genero: "Ciencia ficción",
+        rating: "8.8",
+        anio: "2026",
+        duracion: "2h 20min",
+        popular: false,
+        nuevo: true,
+        poster:
+            "https://placehold.co/400x600/0d1820/ffffff?text=Guardianes%20del%20Tiempo"
+    },
+
+    {
+        id: "movie-006",
+        titulo: "Zona de Combate",
+        descripcion:
+            "Una unidad especial queda atrapada detrás de las líneas enemigas.",
+        genero: "Acción",
+        rating: "8.1",
+        anio: "2025",
+        duracion: "1h 52min",
+        popular: false,
+        nuevo: true,
+        poster:
+            "https://placehold.co/400x600/20100e/ffffff?text=Zona%20de%20Combate"
+    },
+
+    {
+        id: "movie-007",
+        titulo: "Dragones de Valyria",
+        descripcion:
+            "Tres hermanos emprenden una aventura para recuperar un antiguo reino.",
+        genero: "Fantasía",
+        rating: "9.0",
+        anio: "2025",
+        duracion: "2h 31min",
+        popular: true,
+        nuevo: false,
+        poster:
+            "https://placehold.co/400x600/1b1425/ffffff?text=Dragones%20de%20Valyria"
+    },
+
+    {
+        id: "movie-008",
+        titulo: "Noche Sin Fin",
+        descripcion:
+            "Una pequeña ciudad queda atrapada en una noche que parece no terminar.",
+        genero: "Terror",
+        rating: "8.4",
+        anio: "2026",
+        duracion: "1h 49min",
+        popular: false,
+        nuevo: true,
+        poster:
+            "https://placehold.co/400x600/120e13/ffffff?text=Noche%20Sin%20Fin"
+    },
+
+    {
+        id: "movie-009",
+        titulo: "Código Omega",
+        descripcion:
+            "Un hacker descubre un programa capaz de controlar sistemas militares.",
+        genero: "Acción",
+        rating: "8.3",
+        anio: "2024",
+        duracion: "2h 02min",
+        popular: true,
+        nuevo: false,
+        poster:
+            "https://placehold.co/400x600/101a20/ffffff?text=Codigo%20Omega"
+    },
+
+    {
+        id: "movie-010",
+        titulo: "Planeta Aurora",
+        descripcion:
+            "Una expedición encuentra un planeta que podría convertirse en el nuevo hogar de la humanidad.",
+        genero: "Ciencia ficción",
+        rating: "9.1",
+        anio: "2026",
+        duracion: "2h 18min",
+        popular: true,
+        nuevo: true,
+        poster:
+            "https://placehold.co/400x600/101827/ffffff?text=Planeta%20Aurora"
+    },
+
+    {
+        id: "movie-011",
+        titulo: "El Bosque Encantado",
+        descripcion:
+            "Una joven entra a un bosque mágico buscando respuestas sobre su pasado.",
+        genero: "Fantasía",
+        rating: "8.0",
+        anio: "2024",
+        duracion: "1h 55min",
+        popular: false,
+        nuevo: false,
+        poster:
+            "https://placehold.co/400x600/102018/ffffff?text=El%20Bosque%20Encantado"
+    },
+
+    {
+        id: "movie-012",
+        titulo: "El Último Ritual",
+        descripcion:
+            "Un investigador descubre que una serie de desapariciones están relacionadas con un antiguo ritual.",
+        genero: "Terror",
+        rating: "8.6",
+        anio: "2026",
+        duracion: "1h 51min",
+        popular: false,
+        nuevo: true,
+        poster:
+            "https://placehold.co/400x600/171017/ffffff?text=El%20Ultimo%20Ritual"
+    }
+
+];
+
+
+const SERIES_PRUEBA = [
+
+    {
+        id: "series-001",
+        titulo: "Guardianes del Futuro",
+        descripcion:
+            "Un grupo de viajeros protege diferentes líneas temporales.",
+        genero: "Ciencia ficción",
+        rating: "9.0",
+        anio: "2026",
+        temporadas: "2 temporadas",
+        poster:
+            "https://placehold.co/400x600/101b27/ffffff?text=Guardianes%20del%20Futuro"
+    },
+
+    {
+        id: "series-002",
+        titulo: "Distrito 9",
+        descripcion:
+            "Una unidad especial investiga los casos más peligrosos de la ciudad.",
+        genero: "Acción",
+        rating: "8.7",
+        anio: "2025",
+        temporadas: "3 temporadas",
+        poster:
+            "https://placehold.co/400x600/1c1311/ffffff?text=Distrito%209"
+    },
+
+    {
+        id: "series-003",
+        titulo: "Reino de Sombras",
+        descripcion:
+            "Una princesa debe descubrir el secreto detrás de una antigua maldición.",
+        genero: "Fantasía",
+        rating: "8.9",
+        anio: "2026",
+        temporadas: "1 temporada",
+        poster:
+            "https://placehold.co/400x600/171122/ffffff?text=Reino%20de%20Sombras"
+    },
+
+    {
+        id: "series-004",
+        titulo: "Archivo Paranormal",
+        descripcion:
+            "Investigadores estudian fenómenos que desafían toda explicación.",
+        genero: "Terror",
+        rating: "8.4",
+        anio: "2025",
+        temporadas: "2 temporadas",
+        poster:
+            "https://placehold.co/400x600/110e15/ffffff?text=Archivo%20Paranormal"
+    },
+
+    {
+        id: "series-005",
+        titulo: "Academia Zero",
+        descripcion:
+            "Un grupo de jóvenes descubre que poseen habilidades extraordinarias.",
+        genero: "Acción",
+        rating: "8.2",
+        anio: "2026",
+        temporadas: "1 temporada",
+        poster:
+            "https://placehold.co/400x600/10151f/ffffff?text=Academia%20Zero"
+    },
+
+    {
+        id: "series-006",
+        titulo: "Más Allá de Marte",
+        descripcion:
+            "La humanidad comienza su primera colonia fuera de la Tierra.",
+        genero: "Ciencia ficción",
+        rating: "9.2",
+        anio: "2026",
+        temporadas: "1 temporada",
+        poster:
+            "https://placehold.co/400x600/101722/ffffff?text=Mas%20Alla%20de%20Marte"
+    },
+
+    {
+        id: "series-007",
+        titulo: "Crónicas del Dragón",
+        descripcion:
+            "Un joven guerrero descubre que es el último heredero de una antigua familia.",
+        genero: "Fantasía",
+        rating: "8.8",
+        anio: "2025",
+        temporadas: "2 temporadas",
+        poster:
+            "https://placehold.co/400x600/191321/ffffff?text=Cronicas%20del%20Dragon"
+    },
+
+    {
+        id: "series-008",
+        titulo: "La Última Puerta",
+        descripcion:
+            "Una puerta misteriosa aparece cada noche en diferentes lugares.",
+        genero: "Terror",
+        rating: "8.5",
+        anio: "2026",
+        temporadas: "1 temporada",
+        poster:
+            "https://placehold.co/400x600/120f14/ffffff?text=La%20Ultima%20Puerta"
+    }
+
+];
 
 
 /* =========================================================
@@ -52,9 +345,11 @@ document.addEventListener(
 );
 
 
-async function init() {
+function init() {
 
     cacheElements();
+
+    cargarContenidoPrueba();
 
     setupNavigation();
 
@@ -64,20 +359,13 @@ async function init() {
 
     setupModal();
 
-    setupModalPlayButton();
-
-    /*
-     * TV se carga independientemente.
-     * Si la API falla, TV seguirá funcionando.
-     */
+    setupSeeAllButtons();
 
     loadM3U();
 
-    /*
-     * Cargar películas y series.
-     */
-
-    await loadContentAPI();
+    console.log(
+        "NETVISION: aplicación iniciada."
+    );
 
 }
 
@@ -102,12 +390,31 @@ function cacheElements() {
 
 
 /* =========================================================
-   UTILIDAD DOM
+   CARGAR DATOS DE PRUEBA
 ========================================================= */
 
-function $(id) {
+function cargarContenidoPrueba() {
 
-    return document.getElementById(id);
+    peliculas =
+        [...PELICULAS_PRUEBA];
+
+    series =
+        [...SERIES_PRUEBA];
+
+
+    renderHomeMovies();
+
+    renderMoviePage();
+
+    renderSeriesPage();
+
+    console.log(
+        `NETVISION: ${peliculas.length} películas de prueba.`
+    );
+
+    console.log(
+        `NETVISION: ${series.length} series de prueba.`
+    );
 
 }
 
@@ -119,26 +426,30 @@ function $(id) {
 function setupNavigation() {
 
     document
-        .querySelectorAll("[data-page]")
-        .forEach(button => {
+        .querySelectorAll(
+            "[data-page]"
+        )
+        .forEach(
+            button => {
 
-            button.addEventListener(
-                "click",
-                event => {
+                button.addEventListener(
+                    "click",
+                    event => {
 
-                    event.preventDefault();
+                        event.preventDefault();
 
-                    const page =
-                        button.dataset.page;
+                        const page =
+                            button.dataset.page;
 
-                    if (!page) return;
+                        if (!page) return;
 
-                    showPage(page);
+                        showPage(page);
 
-                }
-            );
+                    }
+                );
 
-        });
+            }
+        );
 
 
     const mobileMenuBtn =
@@ -196,29 +507,37 @@ function setupNavigation() {
 function showPage(page) {
 
     document
-        .querySelectorAll(".page")
-        .forEach(section => {
+        .querySelectorAll(
+            ".page"
+        )
+        .forEach(
+            section => {
 
-            section.classList.toggle(
-                "active-page",
-                section.id ===
-                `page-${page}`
-            );
+                section.classList.toggle(
+                    "active-page",
+                    section.id ===
+                    `page-${page}`
+                );
 
-        });
+            }
+        );
 
 
     document
-        .querySelectorAll(".nav-link")
-        .forEach(link => {
+        .querySelectorAll(
+            ".nav-link"
+        )
+        .forEach(
+            link => {
 
-            link.classList.toggle(
-                "active",
-                link.dataset.page ===
-                page
-            );
+                link.classList.toggle(
+                    "active",
+                    link.dataset.page ===
+                    page
+                );
 
-        });
+            }
+        );
 
 
     const mainNav =
@@ -234,38 +553,11 @@ function showPage(page) {
     }
 
 
-    /*
-     * Si salimos de TV detenemos
-     * el reproductor.
-     */
-
-    if (page !== "tv") {
+    if (
+        page !== "tv"
+    ) {
 
         stopTV();
-
-    }
-
-
-    /*
-     * Cuando entramos a películas
-     * aseguramos que el catálogo
-     * esté renderizado.
-     */
-
-    if (page === "movies") {
-
-        renderMoviesPage();
-
-    }
-
-
-    /*
-     * Cuando entramos a series.
-     */
-
-    if (page === "series") {
-
-        renderSeriesPage();
 
     }
 
@@ -282,1209 +574,6 @@ function showPage(page) {
 
 
 /* =========================================================
-   API DE CONTENIDO
-========================================================= */
-
-async function loadContentAPI() {
-
-    console.log(
-        "🎬 NETVISION: cargando contenido..."
-    );
-
-
-    try {
-
-        const [
-            movieData,
-            seriesData
-        ] = await Promise.all([
-
-            loadAPIType(
-                "movies"
-            ),
-
-            loadAPIType(
-                "tvshows"
-            )
-
-        ]);
-
-
-        movies =
-            normalizeContentList(
-                movieData,
-                "movie"
-            );
-
-
-        series =
-            normalizeContentList(
-                seriesData,
-                "series"
-            );
-
-
-        console.log(
-            "🎬 Películas:",
-            movies.length
-        );
-
-
-        console.log(
-            "📺 Series:",
-            series.length
-        );
-
-
-        renderHomeMovies();
-
-        renderMoviesPage();
-
-        renderSeriesPage();
-
-        renderSearchContent();
-
-
-    } catch (error) {
-
-        console.error(
-            "❌ Error cargando contenido:",
-            error
-        );
-
-        /*
-         * TV no se toca si la API falla.
-         */
-
-    }
-
-}
-
-
-/* =========================================================
-   CARGAR PÁGINAS DE LA API
-========================================================= */
-
-async function loadAPIType(
-    type
-) {
-
-    const resultados = [];
-
-    let pagina = 1;
-
-    let continuar = true;
-
-
-    while (
-        continuar &&
-        pagina <= API_MAX_PAGES
-    ) {
-
-        try {
-
-            const url =
-                `${CONTENT_API}/list?type=${encodeURIComponent(type)}&page=${pagina}`;
-
-
-            console.log(
-                `🌐 API ${type}: página ${pagina}`
-            );
-
-
-            const response =
-                await fetch(
-                    url,
-                    {
-                        cache:
-                            "no-store"
-                    }
-                );
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    `HTTP ${response.status}`
-                );
-
-            }
-
-
-            const data =
-                await response.json();
-
-
-            /*
-             * Agregar featured.
-             */
-
-            if (
-                Array.isArray(
-                    data.featured
-                )
-            ) {
-
-                resultados.push(
-                    ...data.featured
-                );
-
-            }
-
-
-            /*
-             * La API puede entregar
-             * películas en distintas
-             * propiedades.
-             */
-
-            if (
-                Array.isArray(
-                    data.results
-                )
-            ) {
-
-                resultados.push(
-                    ...data.results
-                );
-
-            }
-
-
-            if (
-                Array.isArray(
-                    data.items
-                )
-            ) {
-
-                resultados.push(
-                    ...data.items
-                );
-
-            }
-
-
-            if (
-                Array.isArray(
-                    data.data
-                )
-            ) {
-
-                resultados.push(
-                    ...data.data
-                );
-
-            }
-
-
-            /*
-             * Determinar si existe
-             * otra página.
-             */
-
-            continuar =
-                data.hasNextPage === true;
-
-
-            if (
-                data.remainingPages !==
-                undefined
-            ) {
-
-                continuar =
-                    Number(
-                        data.remainingPages
-                    ) > 0;
-
-            }
-
-
-            pagina++;
-
-        } catch (error) {
-
-            console.error(
-                `❌ API ${type} página ${pagina}:`,
-                error
-            );
-
-            break;
-
-        }
-
-    }
-
-
-    return resultados;
-
-}
-
-
-/* =========================================================
-   NORMALIZAR CONTENIDO
-========================================================= */
-
-function normalizeContentList(
-    lista,
-    tipo
-) {
-
-    if (
-        !Array.isArray(lista)
-    ) {
-
-        return [];
-
-    }
-
-
-    const mapa =
-        new Map();
-
-
-    lista.forEach(item => {
-
-        if (!item) return;
-
-
-        const titulo =
-            item.title ||
-            item.name ||
-            "Sin título";
-
-
-        const imagen =
-            item.image ||
-            item.poster ||
-            item.cover ||
-            item.thumbnail ||
-            "";
-
-
-        const year =
-            item.year ||
-            item.anio ||
-            "";
-
-
-        const rating =
-            item.rating ||
-            "0.0";
-
-
-        const url =
-            item.url ||
-            "";
-
-
-        const extractUrl =
-            item.extractUrl ||
-            "";
-
-
-        const id =
-            item.id ||
-            slug(
-                titulo +
-                "-" +
-                year
-            );
-
-
-        const contenido = {
-
-            id: String(id),
-
-            titulo: String(
-                titulo
-            ),
-
-            image: imagen,
-
-            poster: imagen,
-
-            anio: String(
-                year
-            ),
-
-            rating: String(
-                rating
-            ),
-
-            url,
-
-            extractUrl,
-
-            tipo,
-
-            descripcion:
-                item.description ||
-                item.descripcion ||
-                "Contenido disponible en NETVISION.",
-
-            categoria:
-                item.category ||
-                "",
-
-            original:
-                item
-
-        };
-
-
-        /*
-         * Evitar duplicados.
-         */
-
-        const clave =
-            `${tipo}-${normalizarTexto(titulo)}-${year}`;
-
-
-        if (
-            !mapa.has(clave)
-        ) {
-
-            mapa.set(
-                clave,
-                contenido
-            );
-
-        }
-
-    });
-
-
-    return Array.from(
-        mapa.values()
-    );
-
-}
-
-
-/* =========================================================
-   HOME - PELÍCULAS
-========================================================= */
-
-function renderHomeMovies() {
-
-    const populares =
-        $("homePopularMovies");
-
-
-    const nuevas =
-        $("homeNewMovies");
-
-
-    if (populares) {
-
-        populares.innerHTML = "";
-
-
-        const lista =
-            [...movies]
-                .sort(
-                    (
-                        a,
-                        b
-                    ) =>
-                        Number(
-                            b.rating
-                        ) -
-                        Number(
-                            a.rating
-                        )
-                )
-                .slice(
-                    0,
-                    8
-                );
-
-
-        lista.forEach(
-            pelicula => {
-
-                populares.appendChild(
-                    createMovieCard(
-                        pelicula
-                    )
-                );
-
-            }
-        );
-
-    }
-
-
-    if (nuevas) {
-
-        nuevas.innerHTML = "";
-
-
-        const lista =
-            [...movies]
-                .sort(
-                    (
-                        a,
-                        b
-                    ) =>
-                        Number(
-                            b.anio
-                        ) -
-                        Number(
-                            a.anio
-                        )
-                )
-                .slice(
-                    0,
-                    8
-                );
-
-
-        lista.forEach(
-            pelicula => {
-
-                nuevas.appendChild(
-                    createMovieCard(
-                        pelicula
-                    )
-                );
-
-            }
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   PÁGINA DE PELÍCULAS
-========================================================= */
-
-function renderMoviesPage() {
-
-    const container =
-        $("movieCategories");
-
-
-    if (!container) return;
-
-
-    if (!movies.length) {
-
-        container.innerHTML = `
-            <div class="search-empty">
-                No hay películas disponibles.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    container.innerHTML = "";
-
-
-    /*
-     * MÁS VISTAS
-     */
-
-    const popularSection =
-        createContentSection(
-            "🔥",
-            "Más vistas",
-            "Las películas mejor valoradas"
-        );
-
-
-    const popularRow =
-        document.createElement(
-            "div"
-        );
-
-
-    popularRow.className =
-        "movie-row";
-
-
-    [...movies]
-        .sort(
-            (
-                a,
-                b
-            ) =>
-                Number(
-                    b.rating
-                ) -
-                Number(
-                    a.rating
-                )
-        )
-        .slice(
-            0,
-            12
-        )
-        .forEach(
-            pelicula => {
-
-                popularRow.appendChild(
-                    createMovieCard(
-                        pelicula
-                    )
-                );
-
-            }
-        );
-
-
-    popularSection
-        .querySelector(
-            ".dynamic-content"
-        )
-        .appendChild(
-            popularRow
-        );
-
-
-    container.appendChild(
-        popularSection
-    );
-
-
-    /*
-     * CATÁLOGO COMPLETO
-     */
-
-    const allSection =
-        createContentSection(
-            "🎬",
-            "Todas las películas",
-            `${movies.length} películas disponibles`
-        );
-
-
-    const allRow =
-        document.createElement(
-            "div"
-        );
-
-
-    allRow.className =
-        "movie-row";
-
-
-    movies.forEach(
-        pelicula => {
-
-            allRow.appendChild(
-                createMovieCard(
-                    pelicula
-                )
-            );
-
-        }
-    );
-
-
-    allSection
-        .querySelector(
-            ".dynamic-content"
-        )
-        .appendChild(
-            allRow
-        );
-
-
-    container.appendChild(
-        allSection
-    );
-
-}
-
-
-/* =========================================================
-   PÁGINA DE SERIES
-========================================================= */
-
-function renderSeriesPage() {
-
-    const container =
-        $("seriesCategories");
-
-
-    if (!container) return;
-
-
-    if (!series.length) {
-
-        container.innerHTML = `
-            <div class="search-empty">
-                No hay series disponibles.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    container.innerHTML = "";
-
-
-    /*
-     * MÁS VISTAS
-     */
-
-    const popularSection =
-        createContentSection(
-            "🔥",
-            "Series más vistas",
-            "Las series mejor valoradas"
-        );
-
-
-    const popularRow =
-        document.createElement(
-            "div"
-        );
-
-
-    popularRow.className =
-        "movie-row";
-
-
-    [...series]
-        .sort(
-            (
-                a,
-                b
-            ) =>
-                Number(
-                    b.rating
-                ) -
-                Number(
-                    a.rating
-                )
-        )
-        .slice(
-            0,
-            12
-        )
-        .forEach(
-            item => {
-
-                popularRow.appendChild(
-                    createMovieCard(
-                        item
-                    )
-                );
-
-            }
-        );
-
-
-    popularSection
-        .querySelector(
-            ".dynamic-content"
-        )
-        .appendChild(
-            popularRow
-        );
-
-
-    container.appendChild(
-        popularSection
-    );
-
-
-    /*
-     * TODAS LAS SERIES
-     */
-
-    const allSection =
-        createContentSection(
-            "📺",
-            "Todas las series",
-            `${series.length} series disponibles`
-        );
-
-
-    const allRow =
-        document.createElement(
-            "div"
-        );
-
-
-    allRow.className =
-        "movie-row";
-
-
-    series.forEach(
-        item => {
-
-            allRow.appendChild(
-                createMovieCard(
-                    item
-                )
-            );
-
-        }
-    );
-
-
-    allSection
-        .querySelector(
-            ".dynamic-content"
-        )
-        .appendChild(
-            allRow
-        );
-
-
-    container.appendChild(
-        allSection
-    );
-
-}
-
-
-/* =========================================================
-   CREAR SECCIÓN
-========================================================= */
-
-function createContentSection(
-    icon,
-    titulo,
-    descripcion
-) {
-
-    const section =
-        document.createElement(
-            "section"
-        );
-
-
-    section.className =
-        "content-section dynamic-content-section";
-
-
-    section.innerHTML = `
-
-        <div class="section-header">
-
-            <div>
-
-                <span class="section-kicker">
-                    NETVISION
-                </span>
-
-                <h2>
-                    ${icon}
-                    ${escapeHTML(titulo)}
-                </h2>
-
-                <p class="content-description">
-                    ${escapeHTML(descripcion)}
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="dynamic-content"></div>
-
-    `;
-
-
-    return section;
-
-}
-
-
-/* =========================================================
-   TARJETA DE PELÍCULA / SERIE
-========================================================= */
-
-function createMovieCard(
-    item
-) {
-
-    const card =
-        document.createElement(
-            "article"
-        );
-
-
-    card.className =
-        "movie-card";
-
-
-    card.tabIndex =
-        0;
-
-
-    const imagen =
-        item.image ||
-        item.poster ||
-        "";
-
-
-    const tipo =
-        item.tipo === "series"
-            ? "SERIE"
-            : "PELÍCULA";
-
-
-    card.innerHTML = `
-
-        <div class="movie-poster">
-
-            ${
-                imagen
-
-                ?
-
-                `
-                <img
-                    src="${escapeAttribute(imagen)}"
-                    alt="${escapeAttribute(item.titulo)}"
-                    loading="lazy"
-                    onerror="this.style.display='none';"
-                >
-                `
-
-                :
-
-                `
-                <div class="movie-no-image">
-                    🎬
-                </div>
-                `
-            }
-
-            <div class="movie-card-overlay">
-
-                <button
-                    type="button"
-                    class="movie-play-btn"
-                    aria-label="Abrir ${escapeAttribute(item.titulo)}">
-
-                    ▶
-
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="movie-card-info">
-
-            <h3>
-                ${escapeHTML(item.titulo)}
-            </h3>
-
-
-            <div class="movie-card-meta">
-
-                <span>
-                    ${escapeHTML(item.anio)}
-                </span>
-
-                <span>
-                    ⭐ ${escapeHTML(item.rating)}
-                </span>
-
-                <span>
-                    ${tipo}
-                </span>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    card.addEventListener(
-        "click",
-        () => {
-
-            openContent(
-                item
-            );
-
-        }
-    );
-
-
-    card.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key === "Enter" ||
-                event.key === " "
-            ) {
-
-                event.preventDefault();
-
-                openContent(
-                    item
-                );
-
-            }
-
-        }
-    );
-
-
-    return card;
-
-}
-
-
-/* =========================================================
-   ABRIR CONTENIDO
-========================================================= */
-
-function openContent(
-    item
-) {
-
-    if (!item) return;
-
-
-    currentMovie =
-        item;
-
-
-    /*
-     * Por ahora mostramos
-     * información en el modal.
-     *
-     * No conectamos extract/proxyvideo
-     * todavía.
-     */
-
-    openContentModal(
-        item
-    );
-
-}
-
-
-/* =========================================================
-   MODAL DE CONTENIDO
-========================================================= */
-
-function openContentModal(
-    item
-) {
-
-    const modal =
-        $("contentModal");
-
-
-    if (!modal) return;
-
-
-    const poster =
-        $("modalPoster");
-
-
-    const title =
-        $("modalTitle");
-
-
-    const description =
-        $("modalDescription");
-
-
-    const type =
-        $("modalType");
-
-
-    if (title) {
-
-        title.textContent =
-            item.titulo;
-
-    }
-
-
-    if (type) {
-
-        type.textContent =
-            item.tipo === "series"
-                ? "SERIE"
-                : "PELÍCULA";
-
-    }
-
-
-    if (description) {
-
-        description.textContent =
-            item.descripcion ||
-            `Año: ${item.anio} · Rating: ${item.rating}`;
-
-    }
-
-
-    if (poster) {
-
-        if (item.image) {
-
-            poster.innerHTML = `
-
-                <img
-                    src="${escapeAttribute(item.image)}"
-                    alt="${escapeAttribute(item.titulo)}"
-                >
-
-            `;
-
-        } else {
-
-            poster.innerHTML =
-                "🎬";
-
-        }
-
-    }
-
-
-    modal.classList.add(
-        "show"
-    );
-
-}
-
-
-/* =========================================================
-   MODAL
-========================================================= */
-
-function setupModal() {
-
-    const modal =
-        $("contentModal");
-
-
-    const close =
-        $("closeContent");
-
-
-    if (!modal) return;
-
-
-    if (close) {
-
-        close.addEventListener(
-            "click",
-            () => {
-
-                modal.classList.remove(
-                    "show"
-                );
-
-            }
-        );
-
-    }
-
-
-    modal.addEventListener(
-        "click",
-        event => {
-
-            if (
-                event.target ===
-                modal
-            ) {
-
-                modal.classList.remove(
-                    "show"
-                );
-
-            }
-
-        }
-    );
-
-
-    document.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key ===
-                "Escape"
-            ) {
-
-                modal.classList.remove(
-                    "show"
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   BOTÓN REPRODUCIR DEL MODAL
-========================================================= */
-
-function setupModalPlayButton() {
-
-    const modal =
-        $("contentModal");
-
-
-    if (!modal) return;
-
-
-    modal.addEventListener(
-        "click",
-        event => {
-
-            const button =
-                event.target.closest(
-                    ".primary-btn"
-                );
-
-
-            if (
-                !button ||
-                !currentMovie
-            ) {
-
-                return;
-
-            }
-
-
-            /*
-             * Todavía no enviamos
-             * el contenido al reproductor.
-             */
-
-            mostrarToast(
-                "El reproductor de películas lo conectaremos en el siguiente paso."
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
    BUSCADOR
 ========================================================= */
 
@@ -1493,14 +582,11 @@ function setupSearch() {
     const searchBtn =
         $("searchBtn");
 
-
     const searchOverlay =
         $("searchOverlay");
 
-
     const closeSearch =
         $("closeSearch");
-
 
     const globalSearch =
         $("globalSearch");
@@ -1510,6 +596,10 @@ function setupSearch() {
         !searchBtn ||
         !searchOverlay
     ) {
+
+        console.warn(
+            "NETVISION: no se encontró el botón de búsqueda."
+        );
 
         return;
 
@@ -1533,7 +623,6 @@ function setupSearch() {
 
                 globalSearch.value =
                     "";
-
 
                 renderSearchResults(
                     ""
@@ -1654,8 +743,8 @@ function renderSearchResults(
 
             <div class="search-empty">
 
-                Escribe el nombre de una película,
-                serie o canal.
+                Escribe el nombre de una
+                película, serie o canal.
 
             </div>
 
@@ -1666,21 +755,40 @@ function renderSearchResults(
     }
 
 
+    const movieResults =
+        peliculas.filter(
+            pelicula =>
+                contenidoCoincide(
+                    pelicula,
+                    term
+                )
+        );
+
+
+    const seriesResults =
+        series.filter(
+            serie =>
+                contenidoCoincide(
+                    serie,
+                    term
+                )
+        );
+
+
     const channelResults =
         channels.filter(
             channel => {
 
                 const name =
-                    normalizarTexto(
+                    cleanName(
                         channel.name
-                    );
-
+                    ).toLowerCase();
 
                 const category =
-                    normalizarTexto(
-                        channel.category
-                    );
-
+                    String(
+                        channel.category ||
+                        ""
+                    ).toLowerCase();
 
                 return (
                     name.includes(term) ||
@@ -1691,71 +799,21 @@ function renderSearchResults(
         );
 
 
-    const movieResults =
-        movies.filter(
-            item => {
-
-                return
-                    normalizarTexto(
-                        item.titulo
-                    ).includes(term);
-
-            }
-        );
+    const total =
+        movieResults.length +
+        seriesResults.length +
+        channelResults.length;
 
 
-    const seriesResults =
-        series.filter(
-            item => {
-
-                return
-                    normalizarTexto(
-                        item.titulo
-                    ).includes(term);
-
-            }
-        );
-
-
-    /*
-     * IMPORTANTE:
-     * El return de arriba con salto
-     * puede ser problemático.
-     * Por eso volvemos a filtrar
-     * correctamente aquí.
-     */
-
-    const peliculasEncontradas =
-        movies.filter(
-            item =>
-                normalizarTexto(
-                    item.titulo
-                ).includes(term)
-        );
-
-
-    const seriesEncontradas =
-        series.filter(
-            item =>
-                normalizarTexto(
-                    item.titulo
-                ).includes(term)
-        );
-
-
-    if (
-        !channelResults.length &&
-        !peliculasEncontradas.length &&
-        !seriesEncontradas.length
-    ) {
+    if (!total) {
 
         container.innerHTML = `
 
             <div class="search-empty">
 
-                No encontramos resultados para
-                "<strong>
-                    ${escapeHTML(value)}
+                No encontramos resultados
+                para "<strong>
+                ${escapeHTML(value)}
                 </strong>".
 
             </div>
@@ -1770,116 +828,15 @@ function renderSearchResults(
     container.innerHTML = "";
 
 
-    /*
-     * CANALES
-     */
-
-    channelResults
-        .slice(
-            0,
-            5
-        )
-        .forEach(
-            channel => {
-
-                const item =
-                    document.createElement(
-                        "button"
-                    );
-
-
-                item.type =
-                    "button";
-
-
-                item.className =
-                    "search-result-item";
-
-
-                item.innerHTML = `
-
-                    <span class="search-result-logo">
-
-                        ${
-                            channel.logo
-
-                            ?
-
-                            `<img
-                                src="${escapeAttribute(channel.logo)}"
-                                alt="${escapeAttribute(channel.name)}"
-                            >`
-
-                            :
-
-                            "📺"
-                        }
-
-                    </span>
-
-
-                    <span class="search-result-info">
-
-                        <strong>
-                            ${escapeHTML(
-                                cleanName(
-                                    channel.name
-                                )
-                            )}
-                        </strong>
-
-                        <small>
-                            ${escapeHTML(
-                                channel.category
-                            )}
-                            · EN VIVO
-                        </small>
-
-                    </span>
-
-
-                    <span class="search-result-arrow">
-                        ›
-                    </span>
-
-                `;
-
-
-                item.addEventListener(
-                    "click",
-                    () => {
-
-                        openChannel(
-                            channel
-                        );
-
-                    }
-                );
-
-
-                container.appendChild(
-                    item
-                );
-
-            }
-        );
-
-
-    /*
-     * PELÍCULAS
-     */
-
-    peliculasEncontradas
-        .slice(
-            0,
-            5
-        )
+    movieResults
+        .slice(0, 8)
         .forEach(
             pelicula => {
 
                 container.appendChild(
-                    createSearchContentItem(
-                        pelicula
+                    crearResultadoBusqueda(
+                        pelicula,
+                        "PELÍCULA"
                     )
                 );
 
@@ -1887,21 +844,30 @@ function renderSearchResults(
         );
 
 
-    /*
-     * SERIES
-     */
-
-    seriesEncontradas
-        .slice(
-            0,
-            5
-        )
+    seriesResults
+        .slice(0, 8)
         .forEach(
-            item => {
+            serie => {
 
                 container.appendChild(
-                    createSearchContentItem(
-                        item
+                    crearResultadoBusqueda(
+                        serie,
+                        "SERIE"
+                    )
+                );
+
+            }
+        );
+
+
+    channelResults
+        .slice(0, 8)
+        .forEach(
+            channel => {
+
+                container.appendChild(
+                    crearResultadoCanal(
+                        channel
                     )
                 );
 
@@ -1911,101 +877,223 @@ function renderSearchResults(
 }
 
 
-function createSearchContentItem(
-    item
+/* =========================================================
+   RESULTADO CONTENIDO
+========================================================= */
+
+function crearResultadoBusqueda(
+    contenido,
+    tipo
 ) {
 
-    const button =
+    const item =
         document.createElement(
             "button"
         );
 
 
-    button.type =
+    item.type =
         "button";
 
 
-    button.className =
+    item.className =
         "search-result-item";
 
 
-    button.innerHTML = `
+    item.innerHTML = `
 
-        <span class="search-result-logo">
+        <span
+            class="search-result-logo">
 
-            ${
-                item.image
-
-                ?
-
-                `<img
-                    src="${escapeAttribute(item.image)}"
-                    alt="${escapeAttribute(item.titulo)}"
-                >`
-
-                :
-
-                "🎬"
-            }
+            <img
+                src="${escapeAttribute(
+                    contenido.poster
+                )}"
+                alt="${escapeAttribute(
+                    contenido.titulo
+                )}"
+                loading="lazy">
 
         </span>
 
 
-        <span class="search-result-info">
+        <span
+            class="search-result-info">
 
             <strong>
                 ${escapeHTML(
-                    item.titulo
+                    contenido.titulo
                 )}
             </strong>
 
             <small>
-
-                ${
-                    item.tipo === "series"
-                        ? "SERIE"
-                        : "PELÍCULA"
-                }
-
-                · ${escapeHTML(
-                    item.anio
+                ${tipo}
+                ·
+                ${escapeHTML(
+                    contenido.genero
                 )}
-
-                · ⭐ ${escapeHTML(
-                    item.rating
-                )}
-
             </small>
 
         </span>
 
 
-        <span class="search-result-arrow">
+        <span
+            class="search-result-arrow">
+
             ›
+
         </span>
 
     `;
 
 
-    button.addEventListener(
+    item.addEventListener(
         "click",
         () => {
 
-            $("searchOverlay")
-                ?.classList.remove(
-                    "show"
-                );
-
-
             openContent(
-                item
+                contenido,
+                tipo
             );
 
         }
     );
 
 
-    return button;
+    return item;
+
+}
+
+
+/* =========================================================
+   RESULTADO CANAL
+========================================================= */
+
+function crearResultadoCanal(
+    channel
+) {
+
+    const item =
+        document.createElement(
+            "button"
+        );
+
+
+    item.type =
+        "button";
+
+
+    item.className =
+        "search-result-item";
+
+
+    item.innerHTML = `
+
+        <span
+            class="search-result-logo">
+
+            ${
+                channel.logo
+
+                ?
+
+                `<img
+                    src="${escapeAttribute(
+                        channel.logo
+                    )}"
+                    alt="${escapeAttribute(
+                        channel.name
+                    )}"
+                    loading="lazy">`
+
+                :
+
+                "📺"
+            }
+
+        </span>
+
+
+        <span
+            class="search-result-info">
+
+            <strong>
+                ${escapeHTML(
+                    cleanName(
+                        channel.name
+                    )
+                )}
+            </strong>
+
+            <small>
+                ${escapeHTML(
+                    channel.category
+                )}
+                · EN VIVO
+            </small>
+
+        </span>
+
+
+        <span
+            class="search-result-arrow">
+
+            ›
+
+        </span>
+
+    `;
+
+
+    item.addEventListener(
+        "click",
+        () => {
+
+            openChannel(
+                channel
+            );
+
+        }
+    );
+
+
+    return item;
+
+}
+
+
+/* =========================================================
+   BUSCAR CONTENIDO
+========================================================= */
+
+function contenidoCoincide(
+    contenido,
+    term
+) {
+
+    const texto = [
+
+        contenido.titulo,
+
+        contenido.genero,
+
+        contenido.descripcion,
+
+        contenido.anio
+
+    ]
+        .map(
+            valor =>
+                normalizarTexto(
+                    valor
+                )
+        )
+        .join(" ");
+
+
+    return texto.includes(
+        term
+    );
 
 }
 
@@ -2018,7 +1106,6 @@ function setupProfile() {
 
     const profileBtn =
         $("profileBtn");
-
 
     const profileMenu =
         $("profileMenu");
@@ -2045,25 +1132,6 @@ function setupProfile() {
             profileMenu.classList.toggle(
                 "show"
             );
-
-        }
-    );
-
-
-    profileMenu.addEventListener(
-        "click",
-        event => {
-
-            if (
-                event.target ===
-                profileMenu
-            ) {
-
-                profileMenu.classList.remove(
-                    "show"
-                );
-
-            }
 
         }
     );
@@ -2150,6 +1218,965 @@ function setupProfile() {
 
 
 /* =========================================================
+   MODAL
+========================================================= */
+
+function setupModal() {
+
+    const modal =
+        $("contentModal");
+
+    const close =
+        $("closeContent");
+
+
+    if (!modal) return;
+
+
+    if (close) {
+
+        close.addEventListener(
+            "click",
+            () => {
+
+                modal.classList.remove(
+                    "show"
+                );
+
+                contenidoActual =
+                    null;
+
+            }
+        );
+
+    }
+
+
+    modal.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target ===
+                modal
+            ) {
+
+                modal.classList.remove(
+                    "show"
+                );
+
+                contenidoActual =
+                    null;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ABRIR CONTENIDO
+========================================================= */
+
+function openContent(
+    contenido,
+    tipo
+) {
+
+    if (!contenido) return;
+
+
+    contenidoActual =
+        contenido;
+
+
+    const modal =
+        $("contentModal");
+
+
+    if (!modal) {
+
+        mostrarToast(
+            `${contenido.titulo} seleccionado.`
+        );
+
+        return;
+
+    }
+
+
+    const poster =
+        $("modalPoster");
+
+    const title =
+        $("modalTitle");
+
+    const description =
+        $("modalDescription");
+
+    const type =
+        $("modalType");
+
+
+    if (poster) {
+
+        poster.innerHTML = `
+
+            <img
+                src="${escapeAttribute(
+                    contenido.poster
+                )}"
+                alt="${escapeAttribute(
+                    contenido.titulo
+                )}"
+                style="
+                    width:100%;
+                    height:100%;
+                    object-fit:cover;
+                    border-radius:10px;
+                "
+            >
+
+        `;
+
+    }
+
+
+    if (title) {
+
+        title.textContent =
+            contenido.titulo;
+
+    }
+
+
+    if (type) {
+
+        type.textContent =
+            tipo;
+
+    }
+
+
+    if (description) {
+
+        description.innerHTML = `
+
+            ${escapeHTML(
+                contenido.descripcion
+            )}
+
+            <br><br>
+
+            <strong>
+                ⭐ ${escapeHTML(
+                    contenido.rating
+                )}
+            </strong>
+
+            &nbsp;&nbsp;
+
+            <strong>
+                📅 ${escapeHTML(
+                    contenido.anio
+                )}
+            </strong>
+
+            ${
+                contenido.duracion
+
+                ?
+
+                `
+                &nbsp;&nbsp;
+
+                <strong>
+                    🕒 ${escapeHTML(
+                        contenido.duracion
+                    )}
+                </strong>
+                `
+
+                :
+
+                `
+                &nbsp;&nbsp;
+
+                <strong>
+                    📺 ${escapeHTML(
+                        contenido.temporadas
+                    )}
+                </strong>
+                `
+            }
+
+        `;
+
+    }
+
+
+    const playButton =
+        modal.querySelector(
+            ".primary-btn"
+        );
+
+
+    if (playButton) {
+
+        playButton.onclick =
+            () => {
+
+                /*
+                 * Los datos actuales son
+                 * únicamente de prueba.
+                 *
+                 * Cuando tengamos una fuente
+                 * de video autorizada,
+                 * aquí conectaremos el
+                 * reproductor.
+                 */
+
+                mostrarToast(
+                    "Esta película es un dato de prueba. El reproductor se conectará cuando agreguemos la fuente de video."
+                );
+
+            };
+
+    }
+
+
+    modal.classList.add(
+        "show"
+    );
+
+}
+
+
+/* =========================================================
+   PELÍCULAS - INICIO
+========================================================= */
+
+function renderHomeMovies() {
+
+    const popular =
+        $("homePopularMovies");
+
+    const newest =
+        $("homeNewMovies");
+
+
+    if (popular) {
+
+        popular.innerHTML =
+            "";
+
+
+        peliculas
+            .filter(
+                pelicula =>
+                    pelicula.popular
+            )
+            .slice(0, 8)
+            .forEach(
+                pelicula => {
+
+                    popular.appendChild(
+                        createMovieCard(
+                            pelicula
+                        )
+                    );
+
+                }
+            );
+
+    }
+
+
+    if (newest) {
+
+        newest.innerHTML =
+            "";
+
+
+        peliculas
+            .filter(
+                pelicula =>
+                    pelicula.nuevo
+            )
+            .slice(0, 8)
+            .forEach(
+                pelicula => {
+
+                    newest.appendChild(
+                        createMovieCard(
+                            pelicula
+                        )
+                    );
+
+                }
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   TARJETA PELÍCULA
+========================================================= */
+
+function createMovieCard(
+    pelicula
+) {
+
+    const card =
+        document.createElement(
+            "article"
+        );
+
+
+    card.className =
+        "movie-card";
+
+
+    card.tabIndex =
+        0;
+
+
+    card.innerHTML = `
+
+        <div
+            class="movie-poster">
+
+            <img
+                src="${escapeAttribute(
+                    pelicula.poster
+                )}"
+                alt="${escapeAttribute(
+                    pelicula.titulo
+                )}"
+                loading="lazy"
+                style="
+                    width:100%;
+                    height:100%;
+                    object-fit:cover;
+                    position:absolute;
+                    inset:0;
+                ">
+
+
+            <div
+                class="movie-poster-content"
+                style="
+                    position:relative;
+                    z-index:2;
+                    width:100%;
+                    margin-top:auto;
+                    padding-top:70%;
+                    background:
+                    linear-gradient(
+                        transparent,
+                        rgba(0,0,0,.88)
+                    );
+                ">
+
+                <div
+                    class="movie-title">
+
+                    ${escapeHTML(
+                        pelicula.titulo
+                    )}
+
+                </div>
+
+
+                <div
+                    class="movie-meta">
+
+                    ⭐ ${escapeHTML(
+                        pelicula.rating
+                    )}
+
+                    ·
+
+                    ${escapeHTML(
+                        pelicula.anio
+                    )}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    card.addEventListener(
+        "click",
+        () => {
+
+            openContent(
+                pelicula,
+                "PELÍCULA"
+            );
+
+        }
+    );
+
+
+    card.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key ===
+                "Enter" ||
+                event.key ===
+                " "
+            ) {
+
+                event.preventDefault();
+
+                openContent(
+                    pelicula,
+                    "PELÍCULA"
+                );
+
+            }
+
+        }
+    );
+
+
+    return card;
+
+}
+
+
+/* =========================================================
+   PÁGINA DE PELÍCULAS
+========================================================= */
+
+function renderMoviePage() {
+
+    const container =
+        $("movieCategories");
+
+
+    if (!container) return;
+
+
+    container.innerHTML =
+        "";
+
+
+    const categorias =
+        obtenerCategorias(
+            peliculas
+        );
+
+
+    categorias.forEach(
+        categoria => {
+
+            const section =
+                document.createElement(
+                    "section"
+                );
+
+
+            section.className =
+                "category-section";
+
+
+            const lista =
+                peliculas.filter(
+                    pelicula =>
+                        normalizarTexto(
+                            pelicula.genero
+                        ) ===
+                        normalizarTexto(
+                            categoria
+                        )
+                );
+
+
+            section.innerHTML = `
+
+                <div
+                    class="section-header">
+
+                    <div>
+
+                        <span
+                            class="section-kicker">
+
+                            ${escapeHTML(
+                                categoria
+                            )}
+
+                        </span>
+
+
+                        <h2>
+
+                            ${iconoGenero(
+                                categoria
+                            )}
+
+                            ${escapeHTML(
+                                categoria
+                            )}
+
+                        </h2>
+
+                    </div>
+
+
+                    <span
+                        class="see-all">
+
+                        ${lista.length}
+                        películas
+
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="movie-row">
+
+                </div>
+
+            `;
+
+
+            const row =
+                section.querySelector(
+                    ".movie-row"
+                );
+
+
+            lista.forEach(
+                pelicula => {
+
+                    row.appendChild(
+                        createMovieCard(
+                            pelicula
+                        )
+                    );
+
+                }
+            );
+
+
+            container.appendChild(
+                section
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   PÁGINA DE SERIES
+========================================================= */
+
+function renderSeriesPage() {
+
+    const container =
+        $("seriesCategories");
+
+
+    if (!container) return;
+
+
+    container.innerHTML =
+        "";
+
+
+    const categorias =
+        obtenerCategorias(
+            series
+        );
+
+
+    categorias.forEach(
+        categoria => {
+
+            const section =
+                document.createElement(
+                    "section"
+                );
+
+
+            section.className =
+                "category-section";
+
+
+            const lista =
+                series.filter(
+                    serie =>
+                        normalizarTexto(
+                            serie.genero
+                        ) ===
+                        normalizarTexto(
+                            categoria
+                        )
+                );
+
+
+            section.innerHTML = `
+
+                <div
+                    class="section-header">
+
+                    <div>
+
+                        <span
+                            class="section-kicker">
+
+                            ${escapeHTML(
+                                categoria
+                            )}
+
+                        </span>
+
+
+                        <h2>
+
+                            ${iconoGenero(
+                                categoria
+                            )}
+
+                            ${escapeHTML(
+                                categoria
+                            )}
+
+                        </h2>
+
+                    </div>
+
+
+                    <span
+                        class="see-all">
+
+                        ${lista.length}
+                        series
+
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="movie-row">
+
+                </div>
+
+            `;
+
+
+            const row =
+                section.querySelector(
+                    ".movie-row"
+                );
+
+
+            lista.forEach(
+                serie => {
+
+                    row.appendChild(
+                        createSeriesCard(
+                            serie
+                        )
+                    );
+
+                }
+            );
+
+
+            container.appendChild(
+                section
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   TARJETA SERIE
+========================================================= */
+
+function createSeriesCard(
+    serie
+) {
+
+    const card =
+        document.createElement(
+            "article"
+        );
+
+
+    card.className =
+        "movie-card";
+
+
+    card.tabIndex =
+        0;
+
+
+    card.innerHTML = `
+
+        <div
+            class="movie-poster">
+
+            <img
+                src="${escapeAttribute(
+                    serie.poster
+                )}"
+                alt="${escapeAttribute(
+                    serie.titulo
+                )}"
+                loading="lazy"
+                style="
+                    width:100%;
+                    height:100%;
+                    object-fit:cover;
+                    position:absolute;
+                    inset:0;
+                ">
+
+
+            <div
+                class="movie-poster-content"
+                style="
+                    position:relative;
+                    z-index:2;
+                    width:100%;
+                    margin-top:auto;
+                    padding-top:70%;
+                    background:
+                    linear-gradient(
+                        transparent,
+                        rgba(0,0,0,.88)
+                    );
+                ">
+
+                <div
+                    class="movie-title">
+
+                    ${escapeHTML(
+                        serie.titulo
+                    )}
+
+                </div>
+
+
+                <div
+                    class="movie-meta">
+
+                    ⭐ ${escapeHTML(
+                        serie.rating
+                    )}
+
+                    ·
+
+                    ${escapeHTML(
+                        serie.anio
+                    )}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    card.addEventListener(
+        "click",
+        () => {
+
+            openContent(
+                serie,
+                "SERIE"
+            );
+
+        }
+    );
+
+
+    card.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key ===
+                "Enter" ||
+                event.key ===
+                " "
+            ) {
+
+                event.preventDefault();
+
+                openContent(
+                    serie,
+                    "SERIE"
+                );
+
+            }
+
+        }
+    );
+
+
+    return card;
+
+}
+
+
+/* =========================================================
+   CATEGORÍAS
+========================================================= */
+
+function obtenerCategorias(
+    lista
+) {
+
+    return [
+        ...new Set(
+            lista
+                .map(
+                    item =>
+                        item.genero
+                )
+                .filter(Boolean)
+        )
+    ];
+
+}
+
+
+function iconoGenero(
+    genero
+) {
+
+    const nombre =
+        normalizarTexto(
+            genero
+        );
+
+
+    if (
+        nombre.includes(
+            "accion"
+        )
+    ) {
+
+        return "⚡";
+
+    }
+
+
+    if (
+        nombre.includes(
+            "ciencia"
+        )
+    ) {
+
+        return "🚀";
+
+    }
+
+
+    if (
+        nombre.includes(
+            "fantasia"
+        )
+    ) {
+
+        return "🪄";
+
+    }
+
+
+    if (
+        nombre.includes(
+            "terror"
+        )
+    ) {
+
+        return "👻";
+
+    }
+
+
+    if (
+        nombre.includes(
+            "anime"
+        )
+    ) {
+
+        return "🍥";
+
+    }
+
+
+    return "🎬";
+
+}
+
+
+/* =========================================================
+   BOTONES VER TODO
+========================================================= */
+
+function setupSeeAllButtons() {
+
+    document
+        .querySelectorAll(
+            ".see-all[data-page]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    event => {
+
+                        event.preventDefault();
+
+                        const page =
+                            button.dataset.page;
+
+                        if (page) {
+
+                            showPage(
+                                page
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================================
    M3U
 ========================================================= */
 
@@ -2230,15 +2257,20 @@ function parseM3U(
 
     const lines =
         text
-            .split(/\r?\n/)
+            .split(
+                /\r?\n/
+            )
             .map(
                 line =>
                     line.trim()
             )
-            .filter(Boolean);
+            .filter(
+                Boolean
+            );
 
 
-    const result = [];
+    const result =
+        [];
 
 
     for (
@@ -2265,7 +2297,9 @@ function parseM3U(
 
 
         const comma =
-            info.indexOf(",");
+            info.indexOf(
+                ","
+            );
 
 
         const attrs =
@@ -2279,9 +2313,11 @@ function parseM3U(
 
         const name =
             comma >= 0
-                ? info.substring(
-                    comma + 1
-                ).trim()
+                ? info
+                    .substring(
+                        comma + 1
+                    )
+                    .trim()
                 : "Canal sin nombre";
 
 
@@ -2429,7 +2465,8 @@ function renderCategories() {
 
             button.innerHTML = `
 
-                <span class="category-icon">
+                <span
+                    class="category-icon">
 
                     ${categoryIcon(
                         category
@@ -2437,7 +2474,9 @@ function renderCategories() {
 
                 </span>
 
-                <span class="category-name">
+
+                <span
+                    class="category-name">
 
                     ${escapeHTML(
                         category
@@ -2445,8 +2484,12 @@ function renderCategories() {
 
                 </span>
 
-                <span class="category-arrow">
+
+                <span
+                    class="category-arrow">
+
                     ›
+
                 </span>
 
             `;
@@ -2472,9 +2515,7 @@ function renderCategories() {
     );
 
 
-    if (
-        categories.length
-    ) {
+    if (categories.length) {
 
         selectCategory(
             currentCategory ||
@@ -2619,7 +2660,8 @@ function createChannelCard(
 
     card.innerHTML = `
 
-        <div class="channel-logo">
+        <div
+            class="channel-logo">
 
             ${
                 channel.logo
@@ -2627,22 +2669,29 @@ function createChannelCard(
                 ?
 
                 `<img
-                    src="${escapeAttribute(channel.logo)}"
-                    alt="${escapeAttribute(channel.name)}"
-                    loading="lazy"
-                >`
+                    src="${escapeAttribute(
+                        channel.logo
+                    )}"
+                    alt="${escapeAttribute(
+                        channel.name
+                    )}"
+                    loading="lazy">`
 
                 :
 
-                `<span>TV</span>`
+                `<span>
+                    TV
+                </span>`
             }
 
         </div>
 
 
-        <div class="channel-card-info">
+        <div
+            class="channel-card-info">
 
-            <div class="channel-name">
+            <div
+                class="channel-name">
 
                 ${escapeHTML(
                     cleanName(
@@ -2653,7 +2702,8 @@ function createChannelCard(
             </div>
 
 
-            <div class="channel-meta">
+            <div
+                class="channel-meta">
 
                 ● EN VIVO
 
@@ -2786,9 +2836,12 @@ function openChannel(
                 ?
 
                 `<img
-                    src="${escapeAttribute(channel.logo)}"
-                    alt="${escapeAttribute(channel.name)}"
-                >`
+                    src="${escapeAttribute(
+                        channel.logo
+                    )}"
+                    alt="${escapeAttribute(
+                        channel.name
+                    )}">`
 
                 :
 
@@ -2814,7 +2867,7 @@ function openChannel(
 
 
 /* =========================================================
-   REPRODUCTOR HLS
+   REPRODUCCIÓN HLS
 ========================================================= */
 
 function playStream(
@@ -2829,11 +2882,9 @@ function playStream(
 
     videoPlayer.pause();
 
-
     videoPlayer.removeAttribute(
         "src"
     );
-
 
     videoPlayer.load();
 
@@ -2978,6 +3029,10 @@ function playStream(
 }
 
 
+/* =========================================================
+   DETENER TV
+========================================================= */
+
 function stopTV() {
 
     currentChannel =
@@ -3041,6 +3096,10 @@ function stopTV() {
 }
 
 
+/* =========================================================
+   DESTRUIR HLS
+========================================================= */
+
 function destroyHLS() {
 
     if (!hls) return;
@@ -3073,11 +3132,13 @@ function destroyHLS() {
 }
 
 
+/* =========================================================
+   PLACEHOLDER
+========================================================= */
+
 function hidePlaceholder() {
 
-    if (
-        playerPlaceholder
-    ) {
+    if (playerPlaceholder) {
 
         playerPlaceholder.classList.add(
             "hidden"
@@ -3090,9 +3151,7 @@ function hidePlaceholder() {
 
 function showPlaceholder() {
 
-    if (
-        playerPlaceholder
-    ) {
+    if (playerPlaceholder) {
 
         playerPlaceholder.classList.remove(
             "hidden"
@@ -3103,15 +3162,13 @@ function showPlaceholder() {
 }
 
 
+/* =========================================================
+   ERROR REPRODUCTOR TV
+========================================================= */
+
 function showPlayerError() {
 
-    if (
-        !playerPlaceholder
-    ) {
-
-        return;
-
-    }
+    if (!playerPlaceholder) return;
 
 
     playerPlaceholder.classList.remove(
@@ -3121,13 +3178,18 @@ function showPlayerError() {
 
     playerPlaceholder.innerHTML = `
 
-        <div class="player-icon">
+        <div
+            class="player-icon">
+
             ⚠
+
         </div>
+
 
         <h3>
             No se pudo reproducir
         </h3>
+
 
         <p>
             El canal no está disponible
@@ -3152,10 +3214,11 @@ function showTVMessage(
 
     container.innerHTML = `
 
-        <div style="
-            padding:12px;
-            color:#ff7580;
-        ">
+        <div
+            style="
+                padding:12px;
+                color:#ff7580;
+            ">
 
             ⚠️
             ${escapeHTML(
@@ -3170,7 +3233,7 @@ function showTVMessage(
 
 
 /* =========================================================
-   HOME - CANALES
+   CANALES EN INICIO
 ========================================================= */
 
 function renderHomeChannels() {
@@ -3377,9 +3440,6 @@ function categoryIcon(
     if (
         name.includes(
             "document"
-        ) ||
-        name.includes(
-            "curiosity"
         )
     ) {
 
@@ -3405,132 +3465,29 @@ function categoryIcon(
 
 
 /* =========================================================
-   TOAST
+   UTILIDADES
 ========================================================= */
 
-function mostrarToast(
-    mensaje
+function normalizarTexto(
+    texto
 ) {
 
-    let toast =
-        document.getElementById(
-            "cineverseToast"
-        );
-
-
-    if (!toast) {
-
-        toast =
-            document.createElement(
-                "div"
-            );
-
-
-        toast.id =
-            "cineverseToast";
-
-
-        toast.style.position =
-            "fixed";
-
-
-        toast.style.left =
-            "50%";
-
-
-        toast.style.bottom =
-            "30px";
-
-
-        toast.style.transform =
-            "translateX(-50%) translateY(20px)";
-
-
-        toast.style.zIndex =
-            "99999";
-
-
-        toast.style.padding =
-            "12px 18px";
-
-
-        toast.style.borderRadius =
-            "12px";
-
-
-        toast.style.background =
-            "rgba(15,15,25,.96)";
-
-
-        toast.style.border =
-            "1px solid rgba(255,255,255,.12)";
-
-
-        toast.style.color =
-            "#fff";
-
-
-        toast.style.fontSize =
-            "13px";
-
-
-        toast.style.boxShadow =
-            "0 15px 40px rgba(0,0,0,.4)";
-
-
-        toast.style.opacity =
-            "0";
-
-
-        toast.style.transition =
-            "all .3s ease";
-
-
-        document.body.appendChild(
-            toast
-        );
-
-    }
-
-
-    toast.textContent =
-        mensaje;
-
-
-    toast.style.opacity =
-        "1";
-
-
-    toast.style.transform =
-        "translateX(-50%) translateY(0)";
-
-
-    clearTimeout(
-        toast._timeout
-    );
-
-
-    toast._timeout =
-        setTimeout(
-            () => {
-
-                toast.style.opacity =
-                    "0";
-
-
-                toast.style.transform =
-                    "translateX(-50%) translateY(20px)";
-
-            },
-            2800
-        );
+    return String(
+        texto ||
+        ""
+    )
+        .toLowerCase()
+        .normalize(
+            "NFD"
+        )
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .trim();
 
 }
 
-
-/* =========================================================
-   UTILIDADES
-========================================================= */
 
 function cleanName(
     name
@@ -3581,33 +3538,13 @@ function slug(
 }
 
 
-function normalizarTexto(
-    texto
-) {
-
-    return String(
-        texto ||
-        ""
-    )
-        .toLowerCase()
-        .normalize(
-            "NFD"
-        )
-        .replace(
-            /[\u0300-\u036f]/g,
-            ""
-        )
-        .trim();
-
-}
-
-
 function escapeHTML(
     value
 ) {
 
     return String(
-        value ?? ""
+        value ??
+        ""
     )
         .replace(
             /&/g,
@@ -3645,12 +3582,124 @@ function escapeAttribute(
 
 
 /* =========================================================
-   CERRAR TV AL SALIR
+   TOAST
+========================================================= */
+
+function mostrarToast(
+    mensaje
+) {
+
+    let toast =
+        document.getElementById(
+            "netvisionToast"
+        );
+
+
+    if (!toast) {
+
+        toast =
+            document.createElement(
+                "div"
+            );
+
+
+        toast.id =
+            "netvisionToast";
+
+
+        toast.style.position =
+            "fixed";
+
+
+        toast.style.left =
+            "50%";
+
+
+        toast.style.bottom =
+            "30px";
+
+
+        toast.style.transform =
+            "translateX(-50%)";
+
+
+        toast.style.zIndex =
+            "999999";
+
+
+        toast.style.padding =
+            "14px 20px";
+
+
+        toast.style.borderRadius =
+            "12px";
+
+
+        toast.style.background =
+            "rgba(10,12,20,.96)";
+
+
+        toast.style.color =
+            "#fff";
+
+
+        toast.style.border =
+            "1px solid rgba(255,255,255,.12)";
+
+
+        toast.style.boxShadow =
+            "0 15px 50px rgba(0,0,0,.5)";
+
+
+        toast.style.fontSize =
+            "14px";
+
+
+        document.body.appendChild(
+            toast
+        );
+
+    }
+
+
+    toast.textContent =
+        mensaje;
+
+
+    toast.style.opacity =
+        "1";
+
+
+    clearTimeout(
+        toast._timer
+    );
+
+
+    toast._timer =
+        setTimeout(
+            () => {
+
+                toast.style.opacity =
+                    "0";
+
+            },
+            3200
+        );
+
+}
+
+
+/* =========================================================
+   ANTES DE CERRAR
 ========================================================= */
 
 window.addEventListener(
     "beforeunload",
-    stopTV
+    () => {
+
+        stopTV();
+
+    }
 );
 
 
@@ -3659,10 +3708,5 @@ window.addEventListener(
 ========================================================= */
 
 console.log(
-    "🔥 NETVISION APP.JS CARGADO"
-);
-
-console.log(
-    "🌐 API:",
-    CONTENT_API
+    "🔥 NETVISION APP.JS COMPLETO CARGADO"
 );
