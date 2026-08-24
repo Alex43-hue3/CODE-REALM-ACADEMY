@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CODE REALM — Acto I</title>
+
+    <link rel="stylesheet" href="act1.css">
+
+</head>
+
+<body>
+
+    <!-- ======================================
+         HEADER
+    ======================================= -->
+
+    <header class="act-header">
+
+        <button
+            class="back-button"
+            onclick="goBack()"
+        >
+            ←
+        </button>
+
+        <div class="act-title">
+
+            <span>ACTO I</span>
+
+            <strong>
+                EL DESPERTAR DEL CÓDIGO
+            </strong>
+
+        </div>
+
+        <div class="exp-display">
+
+            ⭐
+
+            <strong id="exp">
+                0
+            </strong>
+
+            EXP
+
+        </div>
+
+    </header>
+
+
+    <!-- ======================================
+         PROGRESO
+    ======================================= -->
+
+    <div class="progress-container">
+
+        <div class="progress-info">
+
+            <span>
+                PROGRESO DEL ACTO
+            </span>
+
+            <strong id="progressText">
+                0 / 6
+            </strong>
+
+        </div>
+
+        <div class="progress-bar">
+
+            <div id="progressBar"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================
+         CONTENIDO
+    ======================================= -->
+
+    <main class="act-container">
+
+
+        <!-- ==================================
+             PERSONAJE
+        =================================== -->
+
+        <section class="mentor-card">
+
+            <div class="mentor-character">
+                🧙‍♀️
+            </div>
+
+            <div>
+
+                <span class="mentor-name">
+                    LYRA
+                </span>
+
+                <p id="mentorMessage">
+
+                    Bienvenido a tu primera misión,
+                    aventurero.
+
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================
+             MISIONES
+        =================================== -->
+
+        <section class="missions">
+
+            <!-- MISIÓN 1 -->
+
+            <article
+                class="mission"
+                id="mission1"
+            >
+
+                <div class="mission-number">
+                    01
+                </div>
+
+                <div class="mission-content">
+
+                    <span>
+                        FUNDAMENTOS
+                    </span>
+
+                    <h2>
+                        ¿Qué es programar?
+                    </h2>
+
+                    <p>
+                        Descubre qué significa realmente
+                        programar y cómo funcionan las
+                        instrucciones que damos a una
+                        computadora.
+                    </p>
+
+                    <button
+                        class="mission-button"
+                        onclick="startMission(1)"
+                    >
+                        COMENZAR
+                    </button>
+
+                </div>
+
+                <div class="mission-reward">
+                    ⭐ 50 EXP
+                </div>
+
+            </article>
+
+
+            <!-- MISIÓN 2 -->
+
+            <article
+                class="mission locked"
+                id="mission2"
+            >
+
+                <div class="mission-number">
+                    02
+                </div>
+
+                <div class="mission-content">
+
+                    <span>
+                        HERRAMIENTAS
+                    </span>
+
+                    <h2>
+                        Conoce tus herramientas
+                    </h2>
+
+                    <p>
+                        Conoce Visual Studio Code,
+                        nuestro taller de desarrollo.
+                    </p>
+
+                    <button
+                        class="mission-button"
+                        onclick="startMission(2)"
+                    >
+                        COMENZAR
+                    </button>
+
+                </div>
+
+                <div class="mission-reward">
+                    ⭐ 75 EXP
+                </div>
+
+            </article>
+
+
+            <!-- MISIÓN 3 -->
+
+            <article
+                class="mission locked"
+                id="mission3"
+            >
+
+                <div class="mission-number">
+                    03
+                </div>
+
+                <div class="mission-content">
+
+                    <span>
+                        PREPARACIÓN
+                    </span>
+
+                    <h2>
+                        Tu primer proyecto
+                    </h2>
+
+                    <p>
+                        Crea tu primera carpeta de
+                        programación.
+                    </p>
+
+                    <button
+                        class="mission-button"
+                        onclick="startMission(3)"
+                    >
+                        COMENZAR
+                    </button>
+
+                </div>
+
+                <div class="mission-reward">
+                    ⭐ 100 EXP
+                </div>
+
+            </article>
+
+
+            <!-- MISIÓN 4 -->
+
+            <article
+                class="mission locked"
+                id="mission4"
+            >
+
+                <div class="mission-number">
+                    04
+                </div>
+
+                <div class="mission-content">
+
+                    <span>
+                        HTML
+                    </span>
+
+                    <h2>
+                        El nacimiento de una página
+                    </h2>
+
+                    <p>
+                        Escribe tu primer código HTML
+                        en Visual Studio Code.
+                    </p>
+
+                    <button
+                        class="mission-button"
+                        onclick="startMission(4)"
+                    >
+                        COMENZAR
+                    </button>
+
+                </div>
+
+                <div class="mission-reward">
+                    ⭐ 150 EXP
+                </div>
+
+            </article>
+
+
+            <!-- MISIÓN 5 -->
+
+            <article
+                class="mission locked"
+                id="mission5"
+            >
+
+                <div class="mission-number">
+                    05
+                </div>
+
+                <div class="mission-content">
+
+                    <span>
+                        HTML
+                    </span>
+
+                    <h2>
+                        Dale vida a tu página
+                    </h2>
+
+                    <p>
+                        Agrega títulos, textos y tu
+                        primer botón.
+                    </p>
+
+                    <button
+                        class="mission-button"
+                        onclick="startMission(5)"
+                    >
+                        COMENZAR
+                    </button>
+
+                </div>
+
+                <div class="mission-reward">
+                    ⭐ 175 EXP
+                </div>
+
+            </article>
+
+
+            <!-- MINI JEFE -->
+
+            <article
+                class="mission boss locked"
+                id="mission6"
+            >
+
+                <div class="mission-number">
+                    👹
+                </div>
+
+                <div class="mission-content">
+
+                    <span>
+                        MINI JEFE
+                    </span>
+
+                    <h2>
+                        LA PRIMERA PRUEBA
+                    </h2>
+
+                    <p>
+                        Demuestra que realmente
+                        comprendiste lo aprendido.
+                    </p>
+
+                    <button
+                        class="mission-button boss-button"
+                        onclick="startMission(6)"
+                    >
+                        ENFRENTAR
+                    </button>
+
+                </div>
+
+                <div class="mission-reward">
+                    ⭐ 300 EXP
+                </div>
+
+            </article>
+
+        </section>
+
+    </main>
+
+
+    <!-- ======================================
+         MODAL DE MISIÓN
+    ======================================= -->
+
+    <div
+        class="mission-modal"
+        id="missionModal"
+    >
+
+        <div class="modal-card">
+
+            <button
+                class="close-button"
+                onclick="closeMission()"
+            >
+                ×
+            </button>
+
+            <div class="modal-character">
+                🧙‍♀️
+            </div>
+
+            <span
+                class="mentor-name"
+                id="modalMentor"
+            >
+                LYRA
+            </span>
+
+            <h2 id="modalTitle">
+                Misión
+            </h2>
+
+            <div
+                id="modalContent"
+                class="modal-content"
+            >
+            </div>
+
+            <div id="modalActions">
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="act1.js"></script>
+
+</body>
+
+</html>
