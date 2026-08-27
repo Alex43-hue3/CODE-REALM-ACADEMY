@@ -35,8 +35,38 @@ function next(){
  else complete();
 }
 function complete(){
- if(!player.mission1Completed){player.mission1Completed=true;player.act1Completed=Math.max(Number(player.act1Completed||0),1);player.exp=Number(player.exp||0)+25;save();hud();toast("+25 EXP · Misión 1 completada");}
- location.href="home.html";
+
+    if(!player.mission1Completed){
+
+        player.mission1Completed = true;
+
+        // Misión 1 de 2 completada
+        player.act1Completed = Math.max(
+            Number(player.act1Completed || 0),
+            1
+        );
+
+        // Recompensa de la Misión 1
+        player.exp = Number(player.exp || 0) + 50;
+
+        save();
+        hud();
+
+        toast("+50 EXP · Misión 1 completada");
+
+        // Después de mostrar la recompensa,
+        // pasar directamente a la Misión 2
+        setTimeout(() => {
+            location.href = "act2.html";
+        }, 1200);
+
+    } else {
+
+        // Si ya estaba completada,
+        // no vuelve a entregar EXP
+        location.href = "act2.html";
+    }
+}
 }
 function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2200)}
 $("#nextBtn").onclick=next;$("#prevBtn").onclick=()=>{if(step>0){step--;if(step<3)choiceDone=false;render()}};
