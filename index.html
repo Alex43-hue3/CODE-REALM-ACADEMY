@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CODE REALM ACADEMY</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <img src="assets/logo.png" alt="CODE REALM ACADEMY">
+    </a>
+
+    <div class="player-hud">
+      <div class="avatar-mini" id="avatarMini">?</div>
+      <div class="player-info">
+        <strong id="playerNameTop">AVENTURERO</strong>
+        <span id="rankTop">NOVATO</span>
+      </div>
+      <div class="level-box">
+        <span>NIVEL <b id="levelTop">1</b></span>
+        <div class="xp-mini"><i id="xpBarTop"></i></div>
+        <small><b id="xpTop">0</b> / <b id="xpNextTop">100</b> EXP</small>
+      </div>
+    </div>
+
+    <div class="resources">
+      <div class="resource exp"><span>★</span><b id="expResource">0</b><small>EXP</small></div>
+      <div class="resource crystals"><span>♦</span><b id="crystalsResource">0</b><small>CRISTALES</small></div>
+      <div class="resource gold"><span>◉</span><b id="goldResource">0</b><small>ORO</small></div>
+      <button class="icon-button" aria-label="Configuración">⚙</button>
+    </div>
+  </header>
+
+  <main class="welcome-shell">
+    <section class="welcome-copy">
+      <div class="eyebrow">TU AVENTURA COMIENZA AQUÍ</div>
+      <h1>¡BIENVENIDO A<br><span>CODE REALM!</span></h1>
+      <div class="code-divider"><span>&lt;/&gt;</span></div>
+
+      <div class="dialogue-card">
+        <div class="dialogue-title">HOLA, <strong id="welcomeName">AVENTURERO</strong> 👋</div>
+        <p>Soy <b>Lyra</b>, tu guía en este mundo.</p>
+        <p>Aquí aprenderás a programar mientras completas misiones, desbloqueas habilidades y construyes tus propios proyectos.</p>
+        <div class="question" id="welcomeQuestion">¿ESTÁS LISTO PARA COMENZAR TU AVENTURA?</div>
+        <button class="primary-button" id="startAdventure"><span>✦</span> COMENZAR AVENTURA</button>
+      </div>
+    </section>
+
+    <section class="hero-art">
+      <div class="art-glow"></div>
+      <img src="assets/lyra.png" alt="Lyra, guía de CODE REALM">
+      <div class="art-label"><span>GUÍA DEL REINO</span><strong>LYRA</strong></div>
+    </section>
+  </main>
+
+  <section class="features">
+    <article><div class="feature-icon purple">▣</div><div><b>APRENDE</b><span>Desde lo básico hasta nivel avanzado</span></div></article>
+    <article><div class="feature-icon gold">⚔</div><div><b>COMPLETA MISIONES</b><span>Desafíos prácticos y divertidos</span></div></article>
+    <article><div class="feature-icon blue">◇</div><div><b>DESBLOQUEA HABILIDADES</b><span>Mejora tus habilidades de programación</span></div></article>
+    <article><div class="feature-icon violet">♜</div><div><b>GANA RECOMPENSAS</b><span>EXP, cristales, oro y mucho más</span></div></article>
+    <article><div class="feature-icon amber">♛</div><div><b>SUBE DE RANGO</b><span>Conviértete en un gran desarrollador</span></div></article>
+  </section>
+
+  <footer><span>CODE REALM ACADEMY</span><span>Tu aventura. Tu código. Tu reino.</span></footer>
+
+  <div class="intro-overlay" id="introOverlay">
+    <div class="intro-card">
+      <button class="intro-close" id="introClose" aria-label="Cerrar">×</button>
+      <div class="intro-avatar"><img src="assets/lyra.png" alt="Lyra"></div>
+      <div class="intro-content">
+        <span class="intro-tag">LYRA · GUÍA DEL REINO</span>
+        <h2 id="introTitle">Hola, aventurero.</h2>
+        <p id="introText">Mi nombre es Lyra. ¿Con quién tengo el gusto de aprender hoy?</p>
+
+        <div id="introStep"></div>
+
+        <button class="primary-button" id="introNext">CONTINUAR</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
