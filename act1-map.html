@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa del Acto I | CODE REALM ACADEMY</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="home.css">
+<link rel="stylesheet" href="act1-map.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="home.html"><img src="assets/logo.png" alt="CODE REALM ACADEMY"></a>
+  <div class="player-hud">
+    <div class="avatar-mini" id="avatarMini">?</div>
+    <div class="player-info"><strong id="playerName">AVENTURERO</strong><span id="playerRank">NOVATO</span></div>
+    <div class="level-box"><span>NIVEL <b id="playerLevel">1</b></span><div class="xp-mini"><i id="playerXpBar"></i></div><small><b id="playerXp">0</b> / <b id="playerXpNext">100</b> EXP</small></div>
+  </div>
+  <div class="resources">
+    <div class="resource"><span>★</span><b id="expResource">0</b><small>EXP</small></div>
+    <div class="resource"><span>♦</span><b id="crystalsResource">0</b><small>CRISTALES</small></div>
+    <div class="resource"><span>◉</span><b id="goldResource">0</b><small>ORO</small></div>
+  </div>
+</header>
+
+<main class="map-page">
+  <section class="map-hero">
+    <div>
+      <span class="section-tag">MAPA DE PROGRESIÓN</span>
+      <h1>Acto I — El Despertar del Código</h1>
+      <p>Avanza misión por misión. Las completadas quedan disponibles para revisar y la siguiente se desbloquea automáticamente.</p>
+    </div>
+    <button class="back-button" id="backHome">← REGRESAR AL INICIO</button>
+  </section>
+
+  <section class="map-summary">
+    <div class="summary-player">
+      <div class="avatar-large" id="avatarLarge">?</div>
+      <div><span>APRENDIZ</span><h2 id="summaryName">AVENTURERO</h2><b id="summaryRank">NOVATO</b></div>
+    </div>
+    <div class="summary-progress">
+      <div class="summary-line"><span>PROGRESO DEL ACTO</span><strong id="actProgressText">0 / 2</strong></div>
+      <div class="big-progress"><i id="actProgressBar"></i></div>
+      <small id="actPercent">0% completado</small>
+    </div>
+    <button class="continue-button" id="continueBtn">CONTINUAR ✦</button>
+  </section>
+
+  <section class="mission-map">
+    <div class="map-title"><span>⚔️ RUTA DEL APRENDIZ</span><small id="mapHint">Completa una misión para desbloquear la siguiente.</small></div>
+    <div class="mission-list" id="missionList"></div>
+  </section>
+
+  <div class="lyra-tip"><div class="map-lyra"><img src="assets/lyra.png" alt="Lyra"></div><p id="lyraMessage"><b>Lyra dice:</b> Aquí puedes ver exactamente hasta dónde has llegado. Cuando regreses, no tendrás que empezar de nuevo.</p></div>
+</main>
+
+<script src="act1-map.js"></script>
+</body>
+</html>
