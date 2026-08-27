@@ -1,76 +1,716 @@
+const KEY = "codeRealmPlayer";
 
-const KEY="codeRealmPlayer";
-const player={name:"Aventurero",rank:"NOVATO",level:1,exp:0,crystals:0,gold:0,xpNext:100,act1Completed:0,act1Total:13,mission1Completed:false,...(JSON.parse(localStorage.getItem(KEY)||"{}")||{})};
-const $=s=>document.querySelector(s);
-let step=0, choiceDone=false;
-const steps=[
- {title:"Antes de escribir código...", text:`Hola, ${player.name||"aventurero"}. Soy Lyra. Hoy comienza tu primera misión en CODE REALM. Y quiero que sepas algo desde el principio: <b>no necesitas saber programar para estar aquí.</b>`},
- {title:"¿Qué significa programar?", text:"Programar es darle instrucciones a una computadora para que haga algo. Los lenguajes de programación y de marcado nos permiten construir cosas paso a paso. En esta academia aprenderás haciendo, no memorizando sin entender."},
- {title:"Tu primer mapa: HTML", text:"HTML es el lenguaje que utilizaremos para construir la estructura de una página web. No es magia: son piezas con funciones concretas. Más adelante aprenderás CSS para el diseño y JavaScript para la interacción."},
- {title:"Primera decisión", text:"Quiero comprobar que la idea quedó clara. Selecciona la opción que mejor responde a la pregunta. Si te equivocas, no pierdes nada en esta misión: Lyra te explicará el concepto y podrás intentarlo otra vez."},
- {title:"¡Misión completada!", text:"Has terminado tu primera misión. Todavía no hemos construido una página, porque primero aprendiste qué estamos haciendo y por qué. En la siguiente misión prepararemos tus herramientas de trabajo."}
+const saved = JSON.parse(localStorage.getItem(KEY) || "{}");
+
+const player = {
+    name: "Aventurero",
+    rank: "NOVATO",
+    level: 1,
+    exp: 0,
+    crystals: 0,
+    gold: 0,
+    xpNext: 100,
+    act1Completed: 0,
+    act1Total: 2,
+    mission1Completed: false,
+    mission2Completed: false,
+    ...saved
+};
+
+let step = 0;
+let choiceDone = false;
+
+const steps = [
+
+    {
+        title: "Antes de escribir código...",
+        text: `Hola, ${player.name}. Soy Lyra. Hoy comienza tu primera misión en CODE REALM. 
+        Y quiero que sepas algo desde el principio: <b>no necesitas saber programar para estar aquí.</b>`
+    },
+
+    {
+        title: "¿Qué significa programar?",
+        text: `Programar significa darle instrucciones a una computadora para que realice acciones.
+        En CODE REALM no queremos que solamente copies código: queremos que entiendas qué estás escribiendo y por qué.`
+    },
+
+    {
+        title: "Tu primer mapa: HTML",
+        text: `HTML será una de las primeras herramientas que aprenderás.
+        Con HTML construiremos la estructura de nuestras páginas web.
+        Más adelante conocerás CSS y JavaScript.`
+    },
+
+    {
+        title: "Primera decisión",
+        text: `Antes de continuar quiero comprobar que entendiste cómo vamos a aprender.
+        No te preocupes: esta prueba no te quitará EXP.`
+    },
+
+    {
+        title: "¡Misión completada!",
+        text: `Has terminado tu primera misión.
+        Ahora estás listo para preparar tu entorno de programación.`
+    }
+
 ];
-function save(){localStorage.setItem(KEY,JSON.stringify(player))}
-function hud(){
- const n=player.name||"Aventurero", xpct=Math.min(100,player.exp/player.xpNext*100);
- $("#playerName").textContent=n.toUpperCase();$("#playerRank").textContent=player.rank;$("#playerLevel").textContent=player.level;
- $("#playerXp").textContent=player.exp;$("#playerXpNext").textContent=player.xpNext;$("#expResource").textContent=player.exp;
- $("#crystalsResource").textContent=player.crystals;$("#goldResource").textContent=player.gold;$("#avatarMini").textContent=n[0].toUpperCase();$("#playerXpBar").style.width=xpct+"%";
-}
-function render(){
- const s=steps[step];$("#dialogueTitle").textContent=s.title;$("#dialogueText").innerHTML=s.text;
- $("#stepCounter").textContent=`${step+1} / ${steps.length}`;$("#missionBar").style.width=((step+1)/steps.length*100)+"%";
- document.querySelectorAll(".step").forEach((b,i)=>b.classList.toggle("active",i===step));
- const area=$("#lessonArea");
- if(step===0) area.innerHTML=`<div class="lesson-title">🎮 Tu primera regla de CODE REALM</div><p class="lesson-text">Aquí no buscamos que memorices comandos. Primero entenderás qué estás haciendo; después lo practicarás en Visual Studio Code y finalmente demostrarás lo aprendido en un reto.</p><div class="info-grid"><div class="info-box"><div class="icon">🧠</div><b>Entender</b><span>Lyra explica el concepto con ejemplos sencillos.</span></div><div class="info-box"><div class="icon">🛠️</div><b>Practicar</b><span>Harás la tarea real en tu computadora.</span></div><div class="info-box"><div class="icon">⚔️</div><b>Demostrar</b><span>Los retos comprobarán si realmente lo aprendiste.</span></div></div>`;
- if(step===1) area.innerHTML=`<div class="lesson-title">Programar es construir con instrucciones</div><p class="lesson-text">Piensa en una receta. Una computadora también necesita instrucciones claras. Si quieres que aparezca un título, una imagen o un botón, tendrás que indicarle qué elemento quieres y cómo debe comportarse.</p><div class="code-example"><span class="comment">// Más adelante escribirás instrucciones como estas</span><br><span class="tag">&lt;h1&gt;</span>Mi primera página<span class="tag">&lt;/h1&gt;</span></div>`;
- if(step===2) area.innerHTML=`<div class="lesson-title">Conoce las piezas que aprenderás</div><div class="info-grid"><div class="info-box"><div class="icon">🏷️</div><b>HTML</b><span>Construye la estructura y el contenido de la página.</span></div><div class="info-box"><div class="icon">🎨</div><b>CSS</b><span>Da estilo, colores, tamaños y diseño.</span></div><div class="info-box"><div class="icon">⚡</div><b>JavaScript</b><span>Agrega lógica e interacción.</span></div></div><div class="code-example"><span class="tag">&lt;h1&gt;</span>Hola, mundo<span class="tag">&lt;/h1&gt;</span><br><span class="tag">&lt;p&gt;</span>Estoy aprendiendo.<span class="tag">&lt;/p&gt;</span></div>`;
- if(step===3) area.innerHTML=`<div class="lesson-title">⚔️ Prueba de comprensión</div><p class="lesson-text">¿Cuál de estas afirmaciones describe mejor lo que harás en CODE REALM?</p><div class="choice-grid"><button class="choice" data-correct="true">Aprenderé paso a paso, practicaré en Visual Studio Code y resolveré retos.</button><button class="choice">Solo copiaré código sin saber qué significa.</button><button class="choice">El juego hará todos los proyectos por mí.</button><button class="choice">Necesito saber programación antes de empezar.</button></div><div class="feedback" id="feedback"></div>`;
- if(step===4) area.innerHTML=`<div class="reward-box"><div class="star">✦</div><h2>PRIMER PASO COMPLETADO</h2><strong>+25 EXP</strong><p>Has comprendido la filosofía de aprendizaje de CODE REALM. La próxima misión será preparar Visual Studio Code y crear tu primera zona de trabajo.</p></div>`;
- $("#prevBtn").disabled=step===0;$("#nextBtn").textContent=step===3&&!choiceDone?"RESPONDER ✦":step===4?"VOLVER AL MAPA ✦":"CONTINUAR ✦";
-}
-function next(){
- if(step===3&&!choiceDone){const selected=$(".choice.selected"), fb=$("#feedback");if(!selected){fb.textContent="Selecciona una respuesta primero.";fb.className="feedback show bad";return}if(selected.dataset.correct==="true"){selected.classList.add("correct");fb.textContent="¡Correcto! Esa será la filosofía de CODE REALM: entender, practicar y demostrar.";fb.className="feedback show good";choiceDone=true;document.querySelectorAll(".choice:not(.correct)").forEach(x=>x.disabled=true);$("#nextBtn").textContent="CONTINUAR ✦"}else{selected.classList.add("wrong");fb.textContent="Todavía no. Recuerda: el objetivo es que tú aprendas y puedas programar por tu cuenta. Inténtalo otra vez.";fb.className="feedback show bad";return}}
- else if(step<steps.length-1){step++;render()}
- else complete();
-}
-function complete(){
 
-    if(!player.mission1Completed){
+function save() {
+    localStorage.setItem(KEY, JSON.stringify(player));
+}
+
+
+function hud() {
+
+    const name = player.name || "Aventurero";
+
+    const xpNext = Number(player.xpNext || 100);
+
+    const xp = Number(player.exp || 0);
+
+    const percent = Math.min(100, (xp / xpNext) * 100);
+
+    document.querySelector("#playerName").textContent =
+        name.toUpperCase();
+
+    document.querySelector("#playerRank").textContent =
+        player.rank || "NOVATO";
+
+    document.querySelector("#playerLevel").textContent =
+        player.level || 1;
+
+    document.querySelector("#playerXp").textContent =
+        xp;
+
+    document.querySelector("#playerXpNext").textContent =
+        xpNext;
+
+    document.querySelector("#expResource").textContent =
+        xp;
+
+    document.querySelector("#crystalsResource").textContent =
+        player.crystals || 0;
+
+    document.querySelector("#goldResource").textContent =
+        player.gold || 0;
+
+    document.querySelector("#avatarMini").textContent =
+        name.charAt(0).toUpperCase();
+
+    document.querySelector("#playerXpBar").style.width =
+        percent + "%";
+}
+
+
+function render() {
+
+    const current = steps[step];
+
+    document.querySelector("#dialogueTitle").textContent =
+        current.title;
+
+    document.querySelector("#dialogueText").innerHTML =
+        current.text;
+
+    document.querySelector("#stepCounter").textContent =
+        `${step + 1} / ${steps.length}`;
+
+    document.querySelector("#missionBar").style.width =
+        ((step + 1) / steps.length * 100) + "%";
+
+
+    document.querySelectorAll(".step").forEach((button, index) => {
+
+        button.classList.toggle(
+            "active",
+            index === step
+        );
+
+        button.classList.toggle(
+            "done",
+            index < step
+        );
+
+    });
+
+
+    const area =
+        document.querySelector("#lessonArea");
+
+
+    /* PASO 1 */
+
+    if (step === 0) {
+
+        area.innerHTML = `
+
+            <div class="lesson-title">
+                🎮 Tu primera regla de CODE REALM
+            </div>
+
+            <p class="lesson-text">
+                Aquí no queremos que memorices comandos sin entenderlos.
+                Primero aprenderás qué significa cada cosa,
+                después la practicarás en tu computadora
+                y finalmente demostrarás lo aprendido.
+            </p>
+
+            <div class="info-grid">
+
+                <div class="info-box">
+                    <div class="icon">🧠</div>
+                    <b>Entender</b>
+                    <span>
+                        Lyra te explicará cada concepto.
+                    </span>
+                </div>
+
+                <div class="info-box">
+                    <div class="icon">🛠️</div>
+                    <b>Practicar</b>
+                    <span>
+                        Harás ejercicios reales.
+                    </span>
+                </div>
+
+                <div class="info-box">
+                    <div class="icon">⚔️</div>
+                    <b>Demostrar</b>
+                    <span>
+                        Resolverás retos para comprobar
+                        lo aprendido.
+                    </span>
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* PASO 2 */
+
+    if (step === 1) {
+
+        area.innerHTML = `
+
+            <div class="lesson-title">
+                💻 Programar es construir con instrucciones
+            </div>
+
+            <p class="lesson-text">
+
+                Imagina que quieres decirle a una computadora:
+
+                <br><br>
+
+                <b>"Quiero mostrar un título".</b>
+
+                <br><br>
+
+                La computadora necesita que le indiquemos
+                exactamente qué queremos hacer.
+
+            </p>
+
+            <div class="code-example">
+
+                &lt;h1&gt;
+
+                Mi primera página
+
+                &lt;/h1&gt;
+
+            </div>
+
+            <p class="lesson-text">
+
+                Más adelante aprenderás qué significa
+                cada parte de este código.
+
+            </p>
+
+        `;
+
+    }
+
+
+    /* PASO 3 */
+
+    if (step === 2) {
+
+        area.innerHTML = `
+
+            <div class="lesson-title">
+                🌐 Tus primeras tecnologías
+            </div>
+
+            <div class="info-grid">
+
+                <div class="info-box">
+
+                    <div class="icon">🏷️</div>
+
+                    <b>HTML</b>
+
+                    <span>
+                        Construye la estructura
+                        y contenido de una página.
+                    </span>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <div class="icon">🎨</div>
+
+                    <b>CSS</b>
+
+                    <span>
+                        Controla colores,
+                        tamaños y diseño.
+                    </span>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <div class="icon">⚡</div>
+
+                    <b>JavaScript</b>
+
+                    <span>
+                        Agrega interacción
+                        y comportamiento.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="code-example">
+
+                &lt;h1&gt;Hola, mundo&lt;/h1&gt;
+
+                <br>
+
+                &lt;p&gt;Estoy aprendiendo.&lt;/p&gt;
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* PASO 4 */
+
+    if (step === 3) {
+
+        area.innerHTML = `
+
+            <div class="lesson-title">
+                ⚔️ Prueba de comprensión
+            </div>
+
+            <p class="lesson-text">
+
+                ¿Cuál de estas afirmaciones describe
+                mejor cómo aprenderás en CODE REALM?
+
+            </p>
+
+
+            <div class="choice-grid">
+
+                <button class="choice" data-correct="true">
+
+                    Aprenderé paso a paso,
+                    practicaré en Visual Studio Code
+                    y resolveré retos.
+
+                </button>
+
+
+                <button class="choice">
+
+                    Solo copiaré código
+                    sin saber qué significa.
+
+                </button>
+
+
+                <button class="choice">
+
+                    El juego hará todos
+                    los proyectos por mí.
+
+                </button>
+
+
+                <button class="choice">
+
+                    Necesito saber programación
+                    antes de comenzar.
+
+                </button>
+
+            </div>
+
+
+            <div class="feedback" id="feedback"></div>
+
+        `;
+
+    }
+
+
+    /* PASO 5 */
+
+    if (step === 4) {
+
+        area.innerHTML = `
+
+            <div class="reward-box">
+
+                <div class="star">
+                    ✦
+                </div>
+
+                <h2>
+                    PRIMER PASO COMPLETADO
+                </h2>
+
+                <strong>
+                    +50 EXP
+                </strong>
+
+                <p>
+
+                    Has completado tu primera misión.
+
+                    <br><br>
+
+                    Ahora aprenderás a preparar
+                    tu propio entorno de programación
+                    utilizando Visual Studio Code.
+
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    document.querySelector("#prevBtn").disabled =
+        step === 0;
+
+
+    const nextButton =
+        document.querySelector("#nextBtn");
+
+
+    if (step === 3 && !choiceDone) {
+
+        nextButton.textContent =
+            "RESPONDER ✦";
+
+    }
+
+    else if (step === 4) {
+
+        nextButton.textContent =
+            "IR A MISIÓN 2 ✦";
+
+    }
+
+    else {
+
+        nextButton.textContent =
+            "CONTINUAR ✦";
+
+    }
+
+}
+
+
+/* SIGUIENTE */
+
+function next() {
+
+    /* Pregunta */
+
+    if (step === 3 && !choiceDone) {
+
+        const selected =
+            document.querySelector(".choice.selected");
+
+        const feedback =
+            document.querySelector("#feedback");
+
+
+        if (!selected) {
+
+            feedback.textContent =
+                "Selecciona una respuesta primero.";
+
+            feedback.className =
+                "feedback show bad";
+
+            return;
+
+        }
+
+
+        if (selected.dataset.correct === "true") {
+
+            selected.classList.add("correct");
+
+            feedback.textContent =
+                "¡Correcto! Has entendido cómo funciona CODE REALM.";
+
+            feedback.className =
+                "feedback show good";
+
+            choiceDone = true;
+
+
+            document
+                .querySelectorAll(".choice:not(.correct)")
+                .forEach(button => {
+
+                    button.disabled = true;
+
+                });
+
+
+            document.querySelector("#nextBtn").textContent =
+                "CONTINUAR ✦";
+
+        }
+
+        else {
+
+            selected.classList.add("wrong");
+
+            feedback.textContent =
+                "Todavía no. Lee nuevamente la explicación e inténtalo.";
+
+            feedback.className =
+                "feedback show bad";
+
+        }
+
+        return;
+    }
+
+
+    /* Avanzar */
+
+    if (step < steps.length - 1) {
+
+        step++;
+
+        render();
+
+        return;
+
+    }
+
+
+    /* Final */
+
+    complete();
+
+}
+
+
+/* COMPLETAR MISIÓN */
+
+function complete() {
+
+    if (!player.mission1Completed) {
 
         player.mission1Completed = true;
 
-        // Misión 1 de 2 completada
         player.act1Completed = Math.max(
             Number(player.act1Completed || 0),
             1
         );
 
-        // Recompensa de la Misión 1
-        player.exp = Number(player.exp || 0) + 50;
+
+        /* +50 EXP */
+
+        player.exp =
+            Number(player.exp || 0) + 50;
+
 
         save();
+
         hud();
 
-        toast("+50 EXP · Misión 1 completada");
 
-        // Después de mostrar la recompensa,
-        // pasar directamente a la Misión 2
+        toast(
+            "+50 EXP · MISIÓN 1 COMPLETADA"
+        );
+
+
+        /*
+        Esperamos un momento para que
+        el jugador vea la recompensa.
+        */
+
         setTimeout(() => {
-            location.href = "act2.html";
+
+            window.location.href =
+                "act2.html";
+
         }, 1200);
 
-    } else {
-
-        // Si ya estaba completada,
-        // no vuelve a entregar EXP
-        location.href = "act2.html";
     }
+
+    else {
+
+        /*
+        Si ya estaba completada,
+        no vuelve a dar EXP.
+        */
+
+        window.location.href =
+            "act2.html";
+
+    }
+
 }
+
+
+/* MENSAJE */
+
+function toast(message) {
+
+    const element =
+        document.querySelector("#toast");
+
+    element.textContent =
+        message;
+
+    element.classList.add("show");
+
+
+    setTimeout(() => {
+
+        element.classList.remove("show");
+
+    }, 2200);
+
 }
-function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2200)}
-$("#nextBtn").onclick=next;$("#prevBtn").onclick=()=>{if(step>0){step--;if(step<3)choiceDone=false;render()}};
-$("#backHome").onclick=()=>location.href="home.html";
-document.querySelectorAll(".step").forEach(b=>b.onclick=()=>{const target=Number(b.dataset.step);if(target<=step){step=target;render()}});
-document.addEventListener("click",e=>{if(e.target.matches(".choice")){document.querySelectorAll(".choice").forEach(x=>x.classList.remove("selected","wrong"));e.target.classList.add("selected")}});
-hud();render();
+
+
+/* BOTÓN SIGUIENTE */
+
+document
+    .querySelector("#nextBtn")
+    .addEventListener("click", next);
+
+
+/* BOTÓN ANTERIOR */
+
+document
+    .querySelector("#prevBtn")
+    .addEventListener("click", () => {
+
+        if (step > 0) {
+
+            step--;
+
+            if (step < 3) {
+
+                choiceDone = false;
+
+            }
+
+            render();
+
+        }
+
+    });
+
+
+/* REGRESAR AL INICIO */
+
+document
+    .querySelector("#backHome")
+    .addEventListener("click", () => {
+
+        window.location.href =
+            "home.html";
+
+    });
+
+
+/* BOTONES LATERALES */
+
+document
+    .querySelectorAll(".step")
+    .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const target =
+                Number(button.dataset.step);
+
+
+            if (target <= step) {
+
+                step = target;
+
+                render();
+
+            }
+
+        });
+
+    });
+
+
+/* RESPUESTAS */
+
+document.addEventListener("click", event => {
+
+    if (!event.target.matches(".choice")) {
+
+        return;
+
+    }
+
+
+    document
+        .querySelectorAll(".choice")
+        .forEach(button => {
+
+            button.classList.remove(
+                "selected",
+                "wrong"
+            );
+
+        });
+
+
+    event.target.classList.add(
+        "selected"
+    );
+
+});
+
+
+/* INICIAR */
+
+hud();
+
+render();
